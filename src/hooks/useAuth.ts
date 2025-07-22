@@ -1,0 +1,112 @@
+import { useState, useEffect } from 'react';
+import { 
+  User, 
+  onAuthStateChanged, 
+  signOut as firebaseSignOut,
+  RecaptchaVerifier,
+  signInWithPhoneNumber,
+  ConfirmationResult,
+  updateProfile
+} from 'firebase/auth';
+import { auth } from '../config/firebase';
+
+export interface AuthUser {
+  uid: string;
+  phoneNumber: string | null;
+  displayName: string | null;
+}
+
+export const useAuth = () => {
+  const [user, setUser] = useState<AuthUser | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null);
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: User | null) => {
+      if (firebaseUser) {
+        setUser({
+          uid: firebaseUser.uid,
+          phoneNumber: firebaseUser.phoneNumber,
+          displayName: firebaseUser.displayName
+        });
+      } else {
+        setUser(null);
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, []);
+
+  const initializeRecaptcha = (containerId: string) => {
+    if (!recaptchaVerifier) {
+      const verifier = new RecaptchaVerifier(auth, containerId, {
+        size: 'invisible',
+        callback: () => {
+          // reCAPTCHA solved
+        },
+        'expired-callback': () => {
+          // Response expired
+        }
+      });
+      setRecaptchaVerifier(verifier);
+      return verifier;
+    }
+    return recaptchaVerifier;
+  };
+
+  const sendOTP = async (phoneNumber: string, containerId: string): Promise<ConfirmationResult> => {
+    try {
+      const verifier = initializeRecaptcha(containerId);
+      const formattedPhone = `+91${phoneNumber}`;
+      const confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, verifier);
+      return confirmationResult;
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      throw error;
+    }
+  };
+
+  const verifyOTP = async (confirmationResult: ConfirmationResult, otp: string, displayName?: string) => {
+    try {
+      const result = await confirmationResult.confirm(otp);
+      
+      // If this is a sign-up (displayName provided), update the user profile
+      if (displayName && result.user) {
+        await updateProfile(result.user, {
+          displayName: displayName
+        });
+      }
+      
+      return result;
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      throw error;
+    }
+  };
+
+  const signOut = async () => {
+    try {
+      await firebaseSignOut(auth);
+    } catch (error) {
+      console.error('Error signing out:', error);
+      throw error;
+    }
+  };
+
+  const cleanupRecaptcha = () => {
+    if (recaptchaVerifier) {
+      recaptchaVerifier.clear();
+      setRecaptchaVerifier(null);
+    }
+  };
+
+  return {
+    user,
+    loading,
+    sendOTP,
+    verifyOTP,
+    signOut,
+    cleanupRecaptcha
+  };
+};
