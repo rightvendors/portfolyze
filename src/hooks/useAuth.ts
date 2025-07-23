@@ -48,22 +48,31 @@ export const useAuth = () => {
     });
 }, []);
 
-  const initializeRecaptcha = (containerId: string) => {
-    if (!recaptchaVerifier) {
-      const verifier = new RecaptchaVerifier(auth, containerId, {
-        size: 'invisible',
-        callback: () => {
-          // reCAPTCHA solved
-        },
-        'expired-callback': () => {
-          // Response expired
-        }
-      });
-      setRecaptchaVerifier(verifier);
-      return verifier;
-    }
-    return recaptchaVerifier;
-  };
+  const initializeRecaptcha = (containerId: string = 'recaptcha-container') => {
+  if (!recaptchaVerifier) {
+    const verifier = new RecaptchaVerifier(auth, containerId, {
+      size: 'invisible',
+      callback: (response: string) => {
+        console.log('reCAPTCHA solved:', response);
+        // reCAPTCHA solved — allow OTP sending to proceed
+      },
+      'expired-callback': () => {
+        console.warn('reCAPTCHA expired. Please try again.');
+        // You might want to reset the verifier here
+      }
+    }, auth);
+
+    // Ensure the reCAPTCHA is rendered (especially for fallback to visible)
+    verifier.render().then((widgetId: number) => {
+      console.log('reCAPTCHA widget ID:', widgetId);
+    });
+
+    setRecaptchaVerifier(verifier);
+    return verifier;
+  }
+
+  return recaptchaVerifier;
+};
 
   const sendOTP = async (phoneNumber: string, containerId: string): Promise<ConfirmationResult> => {
     try {
