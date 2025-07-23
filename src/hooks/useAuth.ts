@@ -6,7 +6,9 @@ import {
   RecaptchaVerifier,
   signInWithPhoneNumber,
   ConfirmationResult,
-  updateProfile
+  updateProfile,
+  setPersistence,
+  browserLocalPersistence
 } from 'firebase/auth';
 import { auth } from '../config/firebase';
 
@@ -22,21 +24,29 @@ export const useAuth = () => {
   const [recaptchaVerifier, setRecaptchaVerifier] = useState<RecaptchaVerifier | null>(null);
 
   useEffect(() => {
-    const unsubscribe = onAuthStateChanged(auth, (firebaseUser: User | null) => {
-      if (firebaseUser) {
-        setUser({
-          uid: firebaseUser.uid,
-          phoneNumber: firebaseUser.phoneNumber,
-          displayName: firebaseUser.displayName
-        });
-      } else {
-        setUser(null);
-      }
+  setPersistence(auth, browserLocalPersistence)
+    .then(() => {
+      const unsubscribe = onAuthStateChanged(auth, (firebaseUser: User | null) => {
+        if (firebaseUser) {
+          setUser({
+            uid: firebaseUser.uid,
+            phoneNumber: firebaseUser.phoneNumber,
+            displayName: firebaseUser.displayName
+          });
+        } else {
+          setUser(null);
+        }
+        setLoading(false);
+      });
+
+      // ✅ Return unsubscribe from inside then block
+      return unsubscribe;
+    })
+    .catch((error) => {
+      console.error('Error setting auth persistence:', error);
       setLoading(false);
     });
-
-    return () => unsubscribe();
-  }, []);
+}, []);
 
   const initializeRecaptcha = (containerId: string) => {
     if (!recaptchaVerifier) {
