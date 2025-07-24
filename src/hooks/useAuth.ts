@@ -82,7 +82,7 @@ export const useAuth = () => {
     return new Promise<ConfirmationResult>((resolve, reject) => {
       grecaptcha.enterprise.ready(async () => {
         try {
-          const token = await grecaptcha.enterprise.execute(6Lej3YwrAAAAAJcmQEdR5iU2cCbu9hToRMZIgYyW, {
+          const token = await grecaptcha.enterprise.execute('6Lej3YwrAAAAAJcmQEdR5iU2cCbu9hToRMZIgYyW', {
             action: 'send_otp'
           });
 
