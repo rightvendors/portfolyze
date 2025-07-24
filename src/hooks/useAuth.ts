@@ -5,6 +5,7 @@ import {
   signOut as firebaseSignOut,
   RecaptchaVerifier,
   signInWithPhoneNumber,
+  RecaptchaVerifier,
   ConfirmationResult,
   updateProfile,
   setPersistence,
@@ -75,34 +76,31 @@ export const useAuth = () => {
 };
 
   const sendOTP = async (phoneNumber: string, containerId: string): Promise<ConfirmationResult> => {
-    try {
-      const verifier = initializeRecaptcha(containerId);
-      const formattedPhone = `+91${phoneNumber}`;
-      const confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, verifier);
-      return confirmationResult;
-    } catch (error) {
-      console.error('Error sending OTP:', error);
-      throw error;
-    }
-  };
+  try {
+    const formattedPhone = `+91${phoneNumber}`;
 
-  const verifyOTP = async (confirmationResult: ConfirmationResult, otp: string, displayName?: string) => {
-    try {
-      const result = await confirmationResult.confirm(otp);
-      
-      // If this is a sign-up (displayName provided), update the user profile
-      if (displayName && result.user) {
-        await updateProfile(result.user, {
-          displayName: displayName
-        });
-      }
-      
-      return result;
-    } catch (error) {
-      console.error('Error verifying OTP:', error);
-      throw error;
-    }
-  };
+    return new Promise<ConfirmationResult>((resolve, reject) => {
+      grecaptcha.enterprise.ready(async () => {
+        try {
+          const token = await grecaptcha.enterprise.execute(6Lej3YwrAAAAAJcmQEdR5iU2cCbu9hToRMZIgYyW, {
+            action: 'send_otp'
+          });
+
+          // reCAPTCHA token is retrieved, now proceed
+          const verifier = initializeRecaptcha(containerId);
+          const confirmationResult = await signInWithPhoneNumber(auth, formattedPhone, verifier);
+          resolve(confirmationResult);
+        } catch (error) {
+          console.error('Error sending OTP with reCAPTCHA:', error);
+          reject(error);
+        }
+      });
+    });
+  } catch (error) {
+    console.error('Error preparing OTP with reCAPTCHA:', error);
+    throw error;
+  }
+};
 
   const signOut = async () => {
     try {
