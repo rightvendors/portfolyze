@@ -56,7 +56,7 @@ function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center py-4">
             <div className="flex items-center space-x-2">
-              <LazyImage src="/Original on transparent.png" alt="Portfolyze Logo" className="h-8" />
+              <LazyImage src="/original-on-transparent.png" alt="Portfolyze Logo" className="h-8" />
             </div>
             <div className="flex items-center space-x-3">
               {user ? (
