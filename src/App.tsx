@@ -132,7 +132,7 @@ function App() {
                   {/* Mock Dashboard Header */}
                   <div className="flex items-center justify-between pb-4 border-b border-gray-200">
                     <div className="flex items-center space-x-2">
-                      <LazyImage src="/Primary on transparent.png" alt="Logo" className="w-6 h-6" />
+                      <LazyImage src="/original-on-transparent.png" alt="Logo" className="w-6 h-6" />
                       <span className="text-gray-800 font-bold text-lg">Portfolyze Dashboard</span>
                     </div>
                     <div className="text-sm text-gray-500">
