@@ -58,9 +58,9 @@ const SignInModal: React.FC<SignInModalProps> = ({ isOpen, onClose, onSwitchToSi
     
     try {
       await verifyOTP(confirmationResult, otp);
-      // Success - user is now signed in
-      resetForm();
-      onClose();
+
+// Redirect to app subdomain
+window.location.href = 'https://app.portfolyze.com';
     } catch (error: any) {
       console.error('Error verifying OTP:', error);
       setError(getErrorMessage(error));
