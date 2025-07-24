@@ -102,6 +102,24 @@ export const useAuth = () => {
   }
 };
 
+const verifyOTP = async (confirmationResult: ConfirmationResult, otp: string, displayName?: string) => {
+  try {
+    const result = await confirmationResult.confirm(otp);
+
+    // If displayName is provided (e.g. during sign-up), update the user profile
+    if (displayName && result.user) {
+      await updateProfile(result.user, {
+        displayName: displayName
+      });
+    }
+
+    return result;
+  } catch (error) {
+    console.error('Error verifying OTP:', error);
+    throw error;
+  }
+};
+
   const signOut = async () => {
     try {
       await firebaseSignOut(auth);
