@@ -1,6 +1,6 @@
 # Portfolyze - Portfolio Tracker
 
-A modern Indian financial portfolio tracker built with React, TypeScript, and Firebase.
+A modern Indian financial portfolio tracker built with React, TypeScript, and Tailwind CSS.
 
 ## Features
 
@@ -19,34 +19,7 @@ cd portfolyze
 npm install
 ```
 
-### 2. Firebase Setup
-
-1. Go to [Firebase Console](https://console.firebase.google.com/)
-2. Create a new project
-3. Enable Authentication and select "Phone" as sign-in method
-4. Get your Firebase configuration from Project Settings
-
-### 3. Environment Variables
-
-1. Copy `.env.example` to `.env`
-2. Fill in your Firebase configuration:
-
-```env
-VITE_FIREBASE_API_KEY=your_api_key_here
-VITE_FIREBASE_AUTH_DOMAIN=your_project_id.firebaseapp.com
-VITE_FIREBASE_PROJECT_ID=your_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_project_id.appspot.com
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_sender_id
-VITE_FIREBASE_APP_ID=your_app_id
-```
-
-### 4. Firebase Authentication Setup
-
-1. In Firebase Console, go to Authentication > Sign-in method
-2. Enable "Phone" authentication
-3. Add your domain to authorized domains (for production)
-
-### 5. Run the application
+### 2. Run the application
 
 ```bash
 npm run dev
@@ -54,14 +27,13 @@ npm run dev
 
 ## Authentication Flow
 
-- **Sign Up**: Name + Mobile Number → OTP Verification → Account Created
-- **Sign In**: Mobile Number → OTP Verification → Signed In
-- **Security**: Firebase handles OTP generation and verification
+- **Sign In / Sign Up**: Redirects to app.portfolize.com for authentication
+- **Security**: All user authentication is handled by the app subdomain
 
 ## Tech Stack
 
 - **Frontend**: React 18, TypeScript, Tailwind CSS
-- **Authentication**: Firebase Auth (Phone/OTP)
+- **Authentication**: Handled by app.portfolize.com
 - **Icons**: Lucide React
 - **Build Tool**: Vite
 - **Deployment**: Ready for Netlify/Vercel
@@ -94,11 +66,7 @@ npm run preview
 
 ## Deployment
 
-The app is ready to deploy on platforms like Netlify or Vercel. Make sure to:
-
-1. Set environment variables in your deployment platform
-2. Add your production domain to Firebase authorized domains
-3. Configure reCAPTCHA for production (if needed)
+The app is ready to deploy on platforms like Netlify or Vercel. No additional configuration is required since authentication is handled by app.portfolize.com.
 
 ## License
 

@@ -1,9 +1,6 @@
 import React from 'react';
 import { useState, lazy, Suspense } from 'react';
 import { ArrowRight, Target, TrendingUp, Wallet, BarChart3, PiggyBank, Zap, Shield, Eye, Brain, Lightbulb, Settings, Palette, MessageCircle, Calculator } from 'lucide-react';
-import { useAuth } from './hooks/useAuth';
-import SignInModal from './components/SignInModal';
-import StartFreeModal from './components/StartFreeModal';
 import LazyImage from './components/LazyImage';
 import LazySection from './components/LazySection';
 import StaggeredReveal from './components/StaggeredReveal';
@@ -15,39 +12,15 @@ const CompoundInterestCalculator = lazy(() => import('./components/CompoundInter
 const BucketVisualization = lazy(() => import('./components/BucketVisualization'));
 
 function App() {
-  const { user, loading, signOut } = useAuth();
-  const [showSignIn, setShowSignIn] = useState(false);
-  const [showStartFree, setShowStartFree] = useState(false);
   const [showContact, setShowContact] = useState(false);
 
-  const handleSwitchToSignUp = () => {
-    setShowSignIn(false);
-    setShowStartFree(true);
+  const handleSignIn = () => {
+    window.location.href = 'https://app.portfolize.com';
   };
 
-  const handleSwitchToSignIn = () => {
-    setShowStartFree(false);
-    setShowSignIn(true);
+  const handleStartFree = () => {
+    window.location.href = 'https://app.portfolize.com';
   };
-
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-purple-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-gray-100">
@@ -59,31 +32,16 @@ function App() {
               <LazyImage src="/original-on-transparent.png" alt="Portfolyze Logo" className="h-8" />
             </div>
             <div className="flex items-center space-x-3">
-              {user ? (
-                <div className="flex items-center space-x-3">
-                  <span className="text-white text-sm">
-                    Welcome, {user.displayName || 'User'}
-                  </span>
-                  <button 
-                    onClick={handleSignOut}
-                    className="bg-white hover:bg-gray-100 text-purple-900 px-6 py-2 rounded-lg font-medium transition-colors">
-                    Sign out
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <button 
-                    onClick={() => setShowSignIn(true)}
-                    className="text-white hover:text-gray-200 px-4 py-2 font-medium transition-colors">
-                    Sign in
-                  </button>
-                  <button 
-                    onClick={() => setShowStartFree(true)}
-                    className="bg-white hover:bg-gray-100 text-purple-900 px-6 py-2 rounded-lg font-medium transition-colors">
-                    Start free
-                  </button>
-                </>
-              )}
+              <button 
+                onClick={handleSignIn}
+                className="text-white hover:text-gray-200 px-4 py-2 font-medium transition-colors">
+                Sign in
+              </button>
+              <button 
+                onClick={handleStartFree}
+                className="bg-white hover:bg-gray-100 text-purple-900 px-6 py-2 rounded-lg font-medium transition-colors">
+                Start free
+              </button>
             </div>
           </div>
         </div>
@@ -99,28 +57,17 @@ function App() {
                 <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6 leading-tight">
                   Welcome to <span style={{color: '#4a196d'}}>Portfolyze</span>
                 </h1>
-                <p className="text-xl md:text-2xl text-gray-600 mb-10 leading-relaxed">
-                  Your personal Indian financial portfolio tracker
+                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
+                  Build wealth systematically with intelligent portfolio management, dynamic asset allocation, and personalized financial goals.
                 </p>
-                <p className="text-lg text-gray-700 mb-12 leading-relaxed">
-                  Portfolyze helps you take control of your money by organizing your investments into three smart buckets — the <strong>Folyze Buckets</strong>. 
-                  With a simple, clear dashboard, you can track your trades, current holdings, and progress toward your financial goals.
-                </p>
-                {user ? (
-                  <a 
-                    href="https://app.portfolyze.com"
-                    className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all hover:shadow-lg hover:scale-105 inline-flex items-center space-x-2" style={{backgroundColor: '#4a196d'}} onMouseEnter={(e) => e.target.style.backgroundColor = '#3d1458'} onMouseLeave={(e) => e.target.style.backgroundColor = '#4a196d'}>
-                    <span>Go to Dashboard</span>
-                    <ArrowRight className="w-5 h-5" />
-                  </a>
-                ) : (
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                   <button 
-                    onClick={() => setShowStartFree(true)}
-                    className="text-white px-8 py-4 rounded-lg text-lg font-semibold transition-all hover:shadow-lg hover:scale-105 inline-flex items-center space-x-2" style={{backgroundColor: '#4a196d'}} onMouseEnter={(e) => e.target.style.backgroundColor = '#3d1458'} onMouseLeave={(e) => e.target.style.backgroundColor = '#4a196d'}>
-                    <span>Start Your Journey</span>
+                    onClick={handleStartFree}
+                    className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-4 rounded-lg font-semibold text-lg transition-colors inline-flex items-center justify-center space-x-2">
+                    <span>Start Building Wealth</span>
                     <ArrowRight className="w-5 h-5" />
                   </button>
-                )}
+                </div>
               </div>
             </ScrollReveal>
             
@@ -384,7 +331,7 @@ function App() {
             </div>
           </div>
         }>
-          <CompoundInterestCalculator onStartFree={() => setShowStartFree(true)} user={user} />
+          <CompoundInterestCalculator onStartFree={() => handleStartFree()} />
         </Suspense>
       </LazySection>
 
@@ -503,25 +450,14 @@ function App() {
           <p className="text-xl text-white mb-8 opacity-90">
             Start tracking your investments across all three Folyze Buckets and watch your wealth grow systematically
           </p>
-          {user ? (
-            <a 
-              href="https://app.portfolyze.com"
-              className="bg-white hover:bg-gray-100 px-8 py-4 rounded-lg text-lg font-semibold transition-colors inline-flex items-center space-x-2"
-              style={{color: '#4a196d'}}
-            >
-              <Target className="w-5 h-5" />
-              <span>Go to Dashboard</span>
-            </a>
-          ) : (
-            <button 
-              onClick={() => setShowStartFree(true)}
-              className="bg-white hover:bg-gray-100 px-8 py-4 rounded-lg text-lg font-semibold transition-colors inline-flex items-center space-x-2"
-              style={{color: '#4a196d'}}
-            >
-              <Target className="w-5 h-5" />
-              <span>Start Portfolio Tracking</span>
-            </button>
-          )}
+          <a 
+            href="https://app.portfolyze.com"
+            className="bg-white hover:bg-gray-100 px-8 py-4 rounded-lg text-lg font-semibold transition-colors inline-flex items-center space-x-2"
+            style={{color: '#4a196d'}}
+          >
+            <Target className="w-5 h-5" />
+            <span>Go to Dashboard</span>
+          </a>
         </div>
       </section>
 
@@ -554,16 +490,6 @@ function App() {
       </footer>
 
       {/* Modals */}
-      <SignInModal 
-        isOpen={showSignIn} 
-        onClose={() => setShowSignIn(false)} 
-        onSwitchToSignUp={handleSwitchToSignUp}
-      />
-      <StartFreeModal 
-        isOpen={showStartFree} 
-        onClose={() => setShowStartFree(false)} 
-        onSwitchToSignIn={handleSwitchToSignIn}
-      />
       <Suspense fallback={null}>
         <ContactForm isOpen={showContact} onClose={() => setShowContact(false)} />
       </Suspense>

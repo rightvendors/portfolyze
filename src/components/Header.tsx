@@ -1,5 +1,4 @@
 import React from 'react';
-import { useAuth } from '../hooks/useAuth';
 import LazyImage from './LazyImage';
 
 interface HeaderProps {
@@ -13,14 +12,12 @@ const Header: React.FC<HeaderProps> = ({
   onStartFree, 
   showAuthButtons = true 
 }) => {
-  const { user, signOut } = useAuth();
+  const handleSignIn = () => {
+    window.location.href = 'https://app.portfolize.com';
+  };
 
-  const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
+  const handleStartFree = () => {
+    window.location.href = 'https://app.portfolize.com';
   };
 
   return (
@@ -35,33 +32,16 @@ const Header: React.FC<HeaderProps> = ({
           
           {showAuthButtons && (
             <div className="flex items-center space-x-3">
-              {user ? (
-                <div className="flex items-center space-x-3">
-                  <span className="text-white text-sm">
-                    Welcome, {user.displayName || 'User'}
-                  </span>
-                  <button 
-                    onClick={handleSignOut}
-                    className="bg-white hover:bg-gray-100 text-purple-900 px-6 py-2 rounded-lg font-medium transition-colors">
-                    Sign out
-                  </button>
-                </div>
-              ) : (
-                <>
-                  <button 
-                    <a 
-  href="https://app.portfolyze.com/signin"
-  className="text-white hover:text-gray-200 px-4 py-2 font-medium transition-colors"
->
-  Sign in
-</a>
-                  <button 
-                    onClick={onStartFree}
-                    className="bg-white hover:bg-gray-100 text-purple-900 px-6 py-2 rounded-lg font-medium transition-colors">
-                    Start free
-                  </button>
-                </>
-              )}
+              <button 
+                onClick={onSignIn || handleSignIn}
+                className="text-white hover:text-gray-200 px-4 py-2 font-medium transition-colors">
+                Sign in
+              </button>
+              <button 
+                onClick={onStartFree || handleStartFree}
+                className="bg-white hover:bg-gray-100 text-purple-900 px-6 py-2 rounded-lg font-medium transition-colors">
+                Start free
+              </button>
             </div>
           )}
         </div>

@@ -3,10 +3,9 @@ import { TrendingUp, IndianRupee, Calendar, Target } from 'lucide-react';
 
 interface CompoundInterestCalculatorProps {
   onStartFree?: () => void;
-  user?: any;
 }
 
-const CompoundInterestCalculator: React.FC<CompoundInterestCalculatorProps> = ({ onStartFree, user }) => {
+const CompoundInterestCalculator: React.FC<CompoundInterestCalculatorProps> = ({ onStartFree }) => {
   const [years, setYears] = useState(20);
   const [animatedValue, setAnimatedValue] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
@@ -255,23 +254,13 @@ const CompoundInterestCalculator: React.FC<CompoundInterestCalculatorProps> = ({
             <p className="text-gray-600 mb-6">
               Track your investments across the Folyze Buckets and watch your wealth grow systematically
             </p>
-            {user ? (
-              <a 
-                href="https://app.portfolyze.com"
-                className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors inline-flex items-center space-x-2"
-              >
-                <TrendingUp className="w-5 h-5" />
-                <span>Go to Dashboard</span>
-              </a>
-            ) : (
-              <button 
-                onClick={onStartFree}
-                className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors inline-flex items-center space-x-2"
-              >
-                <TrendingUp className="w-5 h-5" />
-                <span>Begin Portfolio Tracking</span>
-              </button>
-            )}
+            <button 
+              onClick={onStartFree}
+              className="bg-purple-600 hover:bg-purple-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors inline-flex items-center space-x-2"
+            >
+              <TrendingUp className="w-5 h-5" />
+              <span>Begin Portfolio Tracking</span>
+            </button>
           </div>
         </div>
       </div>
