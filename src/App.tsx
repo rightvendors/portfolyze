@@ -15,11 +15,11 @@ function App() {
   const [showContact, setShowContact] = useState(false);
 
   const handleSignIn = () => {
-    window.location.href = 'https://app.portfolize.com';
+    window.location.href = 'https://app.portfolyze.com';
   };
 
   const handleStartFree = () => {
-    window.location.href = 'https://app.portfolize.com';
+    window.location.href = 'https://app.portfolyze.com';
   };
 
   return (

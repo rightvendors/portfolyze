@@ -27,13 +27,13 @@ npm run dev
 
 ## Authentication Flow
 
-- **Sign In / Sign Up**: Redirects to app.portfolize.com for authentication
+- **Sign In / Sign Up**: Redirects to app.portfolyze.com for authentication
 - **Security**: All user authentication is handled by the app subdomain
 
 ## Tech Stack
 
 - **Frontend**: React 18, TypeScript, Tailwind CSS
-- **Authentication**: Handled by app.portfolize.com
+- **Authentication**: Handled by app.portfolyze.com
 - **Icons**: Lucide React
 - **Build Tool**: Vite
 - **Deployment**: Ready for Netlify/Vercel
@@ -66,7 +66,7 @@ npm run preview
 
 ## Deployment
 
-The app is ready to deploy on platforms like Netlify or Vercel. No additional configuration is required since authentication is handled by app.portfolize.com.
+The app is ready to deploy on platforms like Netlify or Vercel. No additional configuration is required since authentication is handled by app.portfolyze.com.
 
 ## License
 
