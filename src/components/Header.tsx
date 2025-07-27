@@ -49,10 +49,12 @@ const Header: React.FC<HeaderProps> = ({
               ) : (
                 <>
                   <button 
-                    onClick={onSignIn}
-                    className="text-white hover:text-gray-200 px-4 py-2 font-medium transition-colors">
-                    Sign in
-                  </button>
+                    <a 
+  href="https://app.portfolyze.com/signin"
+  className="text-white hover:text-gray-200 px-4 py-2 font-medium transition-colors"
+>
+  Sign in
+</a>
                   <button 
                     onClick={onStartFree}
                     className="bg-white hover:bg-gray-100 text-purple-900 px-6 py-2 rounded-lg font-medium transition-colors">
