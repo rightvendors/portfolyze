@@ -23,8 +23,8 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
     
     try {
       // Check if EmailJS is properly configured
-      if (EMAILJS_CONFIG.PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
-        throw new Error('EmailJS not configured. Please update the configuration.');
+      if (!EMAILJS_CONFIG.IS_CONFIGURED || EMAILJS_CONFIG.PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+        throw new Error('EmailJS not configured. Using fallback method.');
       }
       
       // Prepare template parameters
@@ -47,18 +47,11 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
       console.log('Email sent successfully:', result);
       setSubmitted(true);
       setIsSubmitting(false);
-      
-      // Reset form after 3 seconds
-      setTimeout(() => {
-        setSubmitted(false);
-        setFormData({ name: '', email: '', message: '' });
-        onClose();
-      }, 3000);
     } catch (error) {
       console.error('Error sending message:', error);
       setIsSubmitting(false);
       
-      // Fallback to mailto link if EmailJS fails
+      // Fallback to mailto link if EmailJS fails or is not configured
       try {
         const subject = `Contact Form Message from ${formData.name}`;
         const body = `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`;
@@ -66,16 +59,17 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
         window.open(mailtoLink, '_blank');
         
         setSubmitted(true);
-        setTimeout(() => {
-          setSubmitted(false);
-          setFormData({ name: '', email: '', message: '' });
-          onClose();
-        }, 3000);
       } catch (fallbackError) {
         console.error('Fallback also failed:', fallbackError);
         alert('Failed to send message. Please try again or contact us directly at ravisankarpeela@gmail.com');
       }
     }
+  };
+
+  const handleClose = () => {
+    setSubmitted(false);
+    setFormData({ name: '', email: '', message: '' });
+    onClose();
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -91,7 +85,7 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-lg max-w-md w-full p-6 relative">
         <button
-          onClick={onClose}
+          onClick={submitted ? handleClose : onClose}
           className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
         >
           <X size={20} />
@@ -104,7 +98,13 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
             <div className="text-green-600 text-4xl mb-4">✓</div>
             <p className="text-gray-700 mb-2">Thank you for your message!</p>
             <p className="text-sm text-gray-600">Your message has been sent to ravisankarpeela@gmail.com</p>
-            <p className="text-xs text-gray-500 mt-2">We'll get back to you soon!</p>
+            <p className="text-xs text-gray-500 mt-4 mb-6">We'll get back to you soon!</p>
+            <button
+              onClick={handleClose}
+              className="bg-purple-600 hover:bg-purple-700 text-white font-medium py-2 px-6 rounded-md transition-colors"
+            >
+              Close
+            </button>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="space-y-4">
