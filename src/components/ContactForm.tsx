@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { X, Mail, Send } from 'lucide-react';
+import { X, Send } from 'lucide-react';
+import emailjs from '@emailjs/browser';
+import { EMAILJS_CONFIG, EmailTemplateParams } from '../config/emailjs';
 
 interface ContactFormProps {
   isOpen: boolean;
@@ -10,146 +12,166 @@ const ContactForm: React.FC<ContactFormProps> = ({ isOpen, onClose }) => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    company: '',
     message: ''
   });
-  const [isLoading, setIsLoading] = useState(false);
-
-  if (!isOpen) return null;
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
+    setIsSubmitting(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      setIsLoading(false);
-      // Handle successful submission
-      onClose();
-      // Reset form
-      setFormData({ name: '', email: '', company: '', message: '' });
-    }, 1500);
+    try {
+      // Check if EmailJS is properly configured
+      if (EMAILJS_CONFIG.PUBLIC_KEY === 'YOUR_PUBLIC_KEY') {
+        throw new Error('EmailJS not configured. Please update the configuration.');
+      }
+      
+      // Prepare template parameters
+      const templateParams: EmailTemplateParams = {
+        to_email: EMAILJS_CONFIG.TO_EMAIL,
+        from_name: formData.name,
+        from_email: formData.email,
+        message: formData.message,
+        subject: `Contact Form Message from ${formData.name}`
+      };
+      
+      // Send email using EmailJS
+      const result = await emailjs.send(
+        EMAILJS_CONFIG.SERVICE_ID, 
+        EMAILJS_CONFIG.TEMPLATE_ID, 
+        templateParams, 
+        EMAILJS_CONFIG.PUBLIC_KEY
+      );
+      
+      console.log('Email sent successfully:', result);
+      setSubmitted(true);
+      setIsSubmitting(false);
+      
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setSubmitted(false);
+        setFormData({ name: '', email: '', message: '' });
+        onClose();
+      }, 3000);
+    } catch (error) {
+      console.error('Error sending message:', error);
+      setIsSubmitting(false);
+      
+      // Fallback to mailto link if EmailJS fails
+      try {
+        const subject = `Contact Form Message from ${formData.name}`;
+        const body = `Name: ${formData.name}\nEmail: ${formData.email}\n\nMessage:\n${formData.message}`;
+        const mailtoLink = `mailto:ravisankarpeela@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        window.open(mailtoLink, '_blank');
+        
+        setSubmitted(true);
+        setTimeout(() => {
+          setSubmitted(false);
+          setFormData({ name: '', email: '', message: '' });
+          onClose();
+        }, 3000);
+      } catch (fallbackError) {
+        console.error('Fallback also failed:', fallbackError);
+        alert('Failed to send message. Please try again or contact us directly at ravisankarpeela@gmail.com');
+      }
+    }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setFormData(prev => ({
+      ...prev,
+      [e.target.name]: e.target.value
+    }));
   };
+
+  if (!isOpen) return null;
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-100">
-          <div className="flex items-center space-x-3">
-            <h2 className="text-2xl font-bold">
-              Contact <span style={{color: '#4a196d'}}>Portfolyze</span>
-            </h2>
+      <div className="bg-white rounded-lg max-w-md w-full p-6 relative">
+        <button
+          onClick={onClose}
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600"
+        >
+          <X size={20} />
+        </button>
+
+        <h2 className="text-xl font-bold text-gray-900 mb-4">Contact Us</h2>
+
+        {submitted ? (
+          <div className="text-center py-8">
+            <div className="text-green-600 text-4xl mb-4">✓</div>
+            <p className="text-gray-700 mb-2">Thank you for your message!</p>
+            <p className="text-sm text-gray-600">Your message has been sent to ravisankarpeela@gmail.com</p>
+            <p className="text-xs text-gray-500 mt-2">We'll get back to you soon!</p>
           </div>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-          >
-            <X className="w-5 h-5 text-gray-500" />
-          </button>
-        </div>
-
-        {/* Content */}
-        <div className="p-8">
-          <p className="text-gray-600 mb-6 text-lg">
-            Get in touch with us. We'll get back to you as soon as possible.
-          </p>
-
-          <div className="flex items-center text-gray-600 mb-8 p-4 bg-gray-50 rounded-lg">
-            <Mail className="w-5 h-5 mr-3" />
-            <span>info@portfolyze.com</span>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Name *
-                </label>
-                <input
-                  type="text"
-                  name="name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  placeholder="Your full name"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Email *
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  placeholder="your.email@company.com"
-                  className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-                  required
-                />
-              </div>
-            </div>
-
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Company
+              <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
+                Name
               </label>
               <input
                 type="text"
-                name="company"
-                value={formData.company}
-                onChange={handleInputChange}
-                placeholder="Your company name"
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
+                id="name"
+                name="name"
+                value={formData.name}
+                onChange={handleChange}
+                required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Message *
+              <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
+                Email
               </label>
-              <textarea
-                name="message"
-                value={formData.message}
-                onChange={handleInputChange}
-                placeholder="Tell us about your portfolio tracking needs..."
-                rows={6}
-                className="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all resize-none"
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 required
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
               />
             </div>
 
-            <div className="flex justify-end space-x-4">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isLoading || !formData.name || !formData.email || !formData.message}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 text-white rounded-lg font-medium transition-colors inline-flex items-center space-x-2"
-              >
-                <Send className="w-4 h-4" />
-                <span>{isLoading ? 'Sending...' : 'Send Message'}</span>
-              </button>
+            <div>
+              <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
+                Message
+              </label>
+              <textarea
+                id="message"
+                name="message"
+                value={formData.message}
+                onChange={handleChange}
+                required
+                rows={4}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+              />
             </div>
 
-            <div className="text-xs text-gray-500 text-center pt-4 border-t border-gray-100">
-              By submitting this form, you agree to our Terms of Service and Privacy Policy.
-            </div>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-purple-400 text-white font-medium py-2 px-4 rounded-md transition-colors flex items-center justify-center gap-2"
+            >
+              {isSubmitting ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                  Sending...
+                </>
+              ) : (
+                <>
+                  <Send size={16} />
+                  Send Message
+                </>
+              )}
+            </button>
           </form>
-        </div>
+        )}
       </div>
     </div>
   );
